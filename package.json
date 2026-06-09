@@ -9,7 +9,9 @@
     "lint": "eslint",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "setup:env": "bash scripts/setup-env.sh",
+    "db:setup": "npm run setup:env && npm run db:push"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
