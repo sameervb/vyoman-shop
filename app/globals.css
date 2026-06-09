@@ -1,36 +1,49 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────
+   Vyoman Shop — same editorial identity as vyomanaerials.com
+   Paper + ink, photography as the only colour. Fraunces + Hanken Grotesk.
+   ───────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --background: #0a0a0a;
-  --surface: #141414;
-  --text-primary: #f5f5f5;
-  --text-secondary: #888888;
-  --accent: #d4a853;
-  --border: #2a2a2a;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  color-scheme: light;
+  --paper:   #F1EEE7;   /* warm gallery paper          */
+  --paper-2: #FAF8F3;   /* raised surface / card bg    */
+  --ink:     #16150F;   /* near-black, warm            */
+  --ink-2:   #5E5A50;   /* secondary text              */
+  --faint:   #97917F;   /* meta / captions             */
+  --rule:    #D8D2C4;   /* hairlines                   */
+  --rule-2:  #E7E2D6;   /* faint hairlines             */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
-  --color-accent: var(--accent);
-  --color-border: var(--border);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-paper:   var(--paper);
+  --color-paper2:  var(--paper-2);
+  --color-ink:     var(--ink);
+  --color-ink2:    var(--ink-2);
+  --color-faint:   var(--faint);
+  --color-rule:    var(--rule);
+  --color-rule2:   var(--rule-2);
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
 body {
-  background: var(--background);
-  color: var(--text-primary);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Hanken Grotesk', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-weight: 400;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
+
+a { text-decoration: none; color: inherit; }
+img { display: block; }
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--background); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+::-webkit-scrollbar-track { background: var(--paper); }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-2); }

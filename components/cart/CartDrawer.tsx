@@ -17,16 +17,9 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   const removeItem = useCartStore((s) => s.removeItem);
   const subtotalCents = useCartStore((s) => s.subtotalCents());
 
-  // Lock body scroll when drawer is open
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
   }, [open]);
 
   return (
@@ -34,96 +27,89 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
       {/* Backdrop */}
       {open && (
         <div
-          className="fixed inset-0 bg-black/60 z-50 backdrop-blur-sm"
+          style={{ position: "fixed", inset: 0, background: "rgba(22,21,15,0.35)", zIndex: 50, backdropFilter: "blur(4px)" }}
           onClick={onClose}
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-[#141414] border-l border-[#2a2a2a] z-50 flex flex-col transition-transform duration-300 ease-in-out ${
-          open ? "translate-x-0" : "translate-x-full"
-        }`}
+        style={{
+          position: "fixed", top: 0, right: 0, height: "100%",
+          width: "100%", maxWidth: "400px",
+          background: "var(--paper)", borderLeft: "1px solid var(--rule)",
+          zIndex: 51, display: "flex", flexDirection: "column",
+          transform: open ? "translateX(0)" : "translateX(100%)",
+          transition: "transform 0.28s ease",
+        }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[#2a2a2a]">
-          <h2 className="text-sm font-medium tracking-wide text-[#f5f5f5]">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--rule-2)" }}>
+          <h2 style={{ fontSize: "0.875rem", fontWeight: 500, color: "var(--ink)", letterSpacing: "0.02em" }}>
             Your order{" "}
             {items.length > 0 && (
-              <span className="text-[#888888]">({items.length})</span>
+              <span style={{ color: "var(--faint)" }}>({items.length})</span>
             )}
           </h2>
           <button
             onClick={onClose}
-            className="text-[#888888] hover:text-[#f5f5f5] transition-colors"
+            style={{ background: "none", border: "none", cursor: "pointer", color: "var(--ink-2)", display: "flex", alignItems: "center" }}
             aria-label="Close cart"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+            <svg style={{ width: "18px", height: "18px" }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Items */}
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.5rem" }}>
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-4 text-[#888888]">
-              <svg className="w-12 h-12 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", gap: "1rem", color: "var(--faint)" }}>
+              <svg style={{ width: "40px", height: "40px", opacity: 0.35 }} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
               </svg>
-              <p className="text-sm">Your cart is empty</p>
-              <button onClick={onClose}>
-                <Link
-                  href="/shop"
-                  className="text-sm text-[#d4a853] hover:underline"
-                  onClick={onClose}
-                >
-                  Browse the collection →
-                </Link>
-              </button>
+              <p style={{ fontSize: "0.875rem" }}>Your cart is empty</p>
+              <Link href="/shop" onClick={onClose}
+                style={{ fontSize: "0.8125rem", color: "var(--ink)", textDecoration: "underline", textUnderlineOffset: "3px" }}>
+                Browse the collection →
+              </Link>
             </div>
           ) : (
-            <ul className="space-y-4">
+            <ul style={{ listStyle: "none" }}>
               {items.map((item) => (
                 <li
                   key={item.id}
-                  className="flex gap-4 py-4 border-b border-[#2a2a2a] last:border-0"
+                  style={{ display: "flex", gap: "0.875rem", padding: "1rem 0", borderBottom: "1px solid var(--rule-2)" }}
                 >
                   {/* Thumbnail */}
-                  <div className="relative w-16 h-12 rounded overflow-hidden flex-shrink-0 bg-[#2a2a2a]">
-                    <Image
-                      src={item.photoDisplayUrl}
-                      alt={item.photoTitle}
-                      fill
-                      className="object-cover"
-                    />
+                  <div style={{ position: "relative", width: "60px", height: "44px", borderRadius: "3px", overflow: "hidden", flexShrink: 0, background: "var(--rule-2)" }}>
+                    <Image src={item.photoDisplayUrl} alt={item.photoTitle} fill className="object-cover" />
                   </div>
 
                   {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-[#f5f5f5] leading-snug">
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: "0.8125rem", color: "var(--ink)", lineHeight: 1.35 }}>
                       {item.photoTitle}
                     </p>
-                    <p className="text-xs text-[#888888] mt-0.5">
+                    <p style={{ fontSize: "0.75rem", color: "var(--ink-2)", marginTop: "0.2rem" }}>
                       {PRODUCT_LABELS[item.productType]}
-                      {item.frameOption && ` · ${item.frameOption} frame`}
                     </p>
                     {item.personalisation && (
-                      <p className="text-xs text-[#888888] mt-1 italic line-clamp-1">
+                      <p style={{ fontSize: "0.7rem", color: "var(--faint)", marginTop: "0.3rem", fontStyle: "italic", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         &ldquo;{item.personalisation}&rdquo;
                       </p>
                     )}
                   </div>
 
                   {/* Price + remove */}
-                  <div className="flex flex-col items-end justify-between flex-shrink-0">
-                    <span className="text-sm text-[#f5f5f5]">
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", justifyContent: "space-between", flexShrink: 0 }}>
+                    <span style={{ fontSize: "0.8125rem", color: "var(--ink)" }}>
                       {formatPrice(item.priceCents)}
                     </span>
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-[#888888] hover:text-red-400 transition-colors text-xs"
-                      aria-label="Remove item"
+                      style={{ background: "none", border: "none", cursor: "pointer", fontSize: "0.7rem", color: "var(--faint)" }}
                     >
                       Remove
                     </button>
@@ -136,18 +122,22 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="px-6 py-5 border-t border-[#2a2a2a] space-y-4">
-            <div className="flex justify-between text-sm">
-              <span className="text-[#888888]">Subtotal</span>
-              <span className="text-[#f5f5f5]">{formatPrice(subtotalCents)}</span>
+          <div style={{ padding: "1.25rem 1.5rem", borderTop: "1px solid var(--rule-2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", marginBottom: "0.5rem" }}>
+              <span style={{ color: "var(--ink-2)" }}>Subtotal</span>
+              <span style={{ color: "var(--ink)", fontWeight: 500 }}>{formatPrice(subtotalCents)}</span>
             </div>
-            <p className="text-xs text-[#888888]">
+            <p style={{ fontSize: "0.75rem", color: "var(--faint)", marginBottom: "1rem" }}>
               Shipping calculated at checkout
             </p>
             <Link
               href="/checkout"
               onClick={onClose}
-              className="block w-full bg-[#d4a853] hover:bg-[#c49843] text-[#0a0a0a] text-sm font-semibold text-center py-3 rounded transition-colors"
+              style={{
+                display: "block", width: "100%", background: "var(--ink)", color: "var(--paper)",
+                textAlign: "center", padding: "0.875rem", borderRadius: "3px",
+                fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.01em",
+              }}
             >
               Proceed to checkout →
             </Link>

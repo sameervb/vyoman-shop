@@ -7,10 +7,7 @@ interface PersonaliseFieldProps {
   onChange: (value: string) => void;
 }
 
-export default function PersonaliseField({
-  value,
-  onChange,
-}: PersonaliseFieldProps) {
+export default function PersonaliseField({ value, onChange }: PersonaliseFieldProps) {
   const remaining = MAX_CHARS - value.length;
 
   return (
@@ -20,17 +17,21 @@ export default function PersonaliseField({
         onChange={(e) => onChange(e.target.value.slice(0, MAX_CHARS))}
         placeholder="A message for the back — or leave blank for a plain postcard"
         rows={4}
-        className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded px-4 py-3 text-sm text-[#f5f5f5] placeholder-[#555555] focus:outline-none focus:border-[#d4a853] transition-colors resize-none leading-relaxed"
+        style={{
+          width: "100%", background: "var(--paper-2)", border: "1px solid var(--rule)",
+          borderRadius: "3px", padding: "0.75rem 1rem",
+          fontSize: "0.875rem", color: "var(--ink)",
+          fontFamily: "inherit", lineHeight: 1.65, resize: "none",
+          outline: "none", transition: "border-color 0.15s",
+        }}
+        onFocus={e => (e.target.style.borderColor = "var(--ink)")}
+        onBlur={e => (e.target.style.borderColor = "var(--rule)")}
       />
-      <div className="flex justify-between mt-1.5">
-        <p className="text-xs text-[#555555]">
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0.4rem" }}>
+        <p style={{ fontSize: "0.75rem", color: "var(--faint)" }}>
           Printed on the left half of the postcard back.
         </p>
-        <p
-          className={`text-xs tabular-nums ${
-            remaining < 20 ? "text-[#d4a853]" : "text-[#555555]"
-          }`}
-        >
+        <p style={{ fontSize: "0.75rem", color: remaining < 20 ? "var(--ink)" : "var(--faint)", fontVariantNumeric: "tabular-nums" }}>
           {remaining} left
         </p>
       </div>

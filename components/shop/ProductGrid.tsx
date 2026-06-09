@@ -24,11 +24,7 @@ export default function ProductGrid({ photos }: ProductGridProps) {
       : photos.filter((p) =>
           p.availableProducts.some((pt: ProductType) => {
             if (activeFilter === "prints") {
-              return (
-                pt === "matte_poster" ||
-                pt === "framed_print" ||
-                pt === "canvas"
-              );
+              return pt === "matte_poster" || pt === "framed_print" || pt === "canvas";
             }
             if (activeFilter === "gifts") {
               return pt === "mug" || pt === "tote_bag";
@@ -40,16 +36,24 @@ export default function ProductGrid({ photos }: ProductGridProps) {
   return (
     <div>
       {/* Filter tabs */}
-      <div className="flex gap-1 mb-8">
+      <div style={{ display: "flex", gap: "0.25rem", marginBottom: "2.5rem", borderBottom: "1px solid var(--rule-2)", paddingBottom: "0" }}>
         {FILTERS.map((f) => (
           <button
             key={f.value}
             onClick={() => setActiveFilter(f.value)}
-            className={`px-4 py-1.5 text-sm rounded transition-colors ${
-              activeFilter === f.value
-                ? "bg-[#2a2a2a] text-[#f5f5f5]"
-                : "text-[#888888] hover:text-[#f5f5f5]"
-            }`}
+            style={{
+              padding: "0.5rem 1.1rem 0.65rem",
+              fontSize: "0.8rem",
+              fontWeight: 500,
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              letterSpacing: "0.005em",
+              transition: "color 0.15s",
+              borderBottom: activeFilter === f.value ? "2px solid var(--ink)" : "2px solid transparent",
+              marginBottom: "-1px",
+              color: activeFilter === f.value ? "var(--ink)" : "var(--ink-2)",
+            }}
           >
             {f.label}
           </button>
@@ -57,14 +61,14 @@ export default function ProductGrid({ photos }: ProductGridProps) {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.25rem" }}>
         {filtered.map((photo) => (
           <ProductCard key={photo.slug} photo={photo} />
         ))}
       </div>
 
       {filtered.length === 0 && (
-        <p className="text-[#888888] text-sm py-12 text-center">
+        <p style={{ color: "var(--faint)", fontSize: "0.875rem", padding: "4rem 0", textAlign: "center" }}>
           No products found.
         </p>
       )}

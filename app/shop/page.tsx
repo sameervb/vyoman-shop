@@ -3,18 +3,29 @@ import ProductGrid from "@/components/shop/ProductGrid";
 
 export const metadata = {
   title: "Shop · Vyoman",
-  description: "Postcards, art prints, and sticker packs — original aerial photography of Luxembourg.",
+  description: "Original aerial photography of Luxembourg — postcards, prints, canvas, mugs, and totes. Shipped from Europe.",
 };
 
 export default function ShopPage() {
   return (
-    <div className="max-w-6xl mx-auto px-6 py-12">
-      <div className="mb-10">
-        <h1 className="text-lg font-light text-[#f5f5f5] mb-2">Shop</h1>
-        <p className="text-sm text-[#888888]">
-          {catalog.length} photographs. Postcards, prints, stickers. Shipped from Europe.
+    <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "clamp(2.5rem, 6vw, 5rem) clamp(1.25rem, 4vw, 2.5rem)" }}>
+      {/* Header */}
+      <div style={{ marginBottom: "clamp(2.5rem, 5vw, 4rem)" }}>
+        <p style={{ fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "0.85rem" }}>
+          Vyoman · Shop
+        </p>
+        <h1 style={{
+          fontFamily: "'Fraunces', Georgia, serif", fontWeight: 380,
+          fontSize: "clamp(2rem, 4.5vw, 3.5rem)", letterSpacing: "-0.015em", lineHeight: 1.05,
+          color: "var(--ink)", maxWidth: "18ch",
+        }}>
+          Luxembourg, from above.
+        </h1>
+        <p style={{ marginTop: "1rem", fontSize: "1rem", color: "var(--ink-2)", maxWidth: "42ch", lineHeight: 1.65 }}>
+          {catalog.length} photographs. Postcards, prints, canvas, mugs, and totes. Every frame shot on a DJI Mini 5 Pro over Luxembourg.
         </p>
       </div>
+
       <ProductGrid photos={catalog} />
     </div>
   );

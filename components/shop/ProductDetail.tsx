@@ -41,40 +41,57 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
     setTimeout(() => setAdded(false), 2000);
   }
 
+  const isPortrait = photo.aspectRatio === "2:3";
+
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+    <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 2.5rem)" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isPortrait ? "1fr 1fr" : "1.4fr 1fr", gap: "clamp(2rem, 5vw, 5rem)", alignItems: "start" }}
+        className="product-detail-grid">
         {/* Left: Image */}
         <div>
-          <div className={`relative ${photo.aspectRatio === "2:3" ? "aspect-[2/3]" : "aspect-[3/2]"} rounded overflow-hidden bg-[#1a1a1a]`}>
+          <div style={{
+            position: "relative",
+            aspectRatio: isPortrait ? "2/3" : "3/2",
+            borderRadius: "4px", overflow: "hidden",
+            background: "var(--rule-2)",
+          }}>
             <Image
               src={photo.displayImageUrl}
               alt={photo.title}
               fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              sizes="(max-width: 1024px) 100vw, 58vw"
               className="object-cover"
               priority
             />
           </div>
-          <p className="text-xs text-[#888888] mt-3">{photo.shotAt}</p>
+          <p style={{ fontSize: "0.75rem", color: "var(--faint)", marginTop: "0.75rem" }}>
+            {photo.shotAt}
+          </p>
         </div>
 
         {/* Right: Config */}
-        <div className="flex flex-col">
+        <div style={{ display: "flex", flexDirection: "column", paddingTop: "0.5rem" }}>
           {/* Title */}
-          <div className="mb-6">
-            <h1 className="text-xl font-medium text-[#f5f5f5]">
+          <div style={{ marginBottom: "2rem" }}>
+            <p style={{ fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "0.6rem" }}>
+              {photo.location}
+            </p>
+            <h1 style={{
+              fontFamily: "'Fraunces', Georgia, serif",
+              fontWeight: 360, fontSize: "clamp(1.5rem, 2.8vw, 2.1rem)",
+              letterSpacing: "-0.01em", lineHeight: 1.1,
+              color: "var(--ink)",
+            }}>
               {photo.title}
             </h1>
-            <p className="text-sm text-[#888888] mt-1">{photo.location}</p>
-            <p className="text-sm text-[#cccccc] mt-4 leading-relaxed">
+            <p style={{ marginTop: "1rem", fontSize: "0.9375rem", lineHeight: 1.7, color: "var(--ink-2)" }}>
               {photo.description}
             </p>
           </div>
 
           {/* Format selector */}
-          <div className="mb-6">
-            <h2 className="text-xs font-medium text-[#888888] uppercase tracking-wider mb-3">
+          <div style={{ marginBottom: "1.5rem" }}>
+            <h2 style={{ fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "0.75rem" }}>
               Format
             </h2>
             <FormatSelector
@@ -86,14 +103,14 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
           </div>
 
           {/* Product description */}
-          <p className="text-xs text-[#888888] mb-6">
+          <p style={{ fontSize: "0.8rem", color: "var(--faint)", marginBottom: "1.5rem", lineHeight: 1.55 }}>
             {PRODUCT_DESCRIPTIONS[selectedProduct]}
           </p>
 
-          {/* Personalisation (only for postcards) */}
+          {/* Personalisation (postcards only) */}
           {isPostcard && (
-            <div className="mb-6">
-              <h2 className="text-xs font-medium text-[#888888] uppercase tracking-wider mb-3">
+            <div style={{ marginBottom: "1.5rem" }}>
+              <h2 style={{ fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "0.75rem" }}>
                 Message for the back
               </h2>
               <PersonaliseField
@@ -104,23 +121,27 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
           )}
 
           {/* Price + CTA */}
-          <div className="mt-auto pt-6 border-t border-[#2a2a2a]">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-2xl font-light text-[#f5f5f5]">
+          <div style={{ marginTop: "auto", paddingTop: "1.75rem", borderTop: "1px solid var(--rule-2)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1rem" }}>
+              <span style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: "1.75rem", fontWeight: 360, color: "var(--ink)" }}>
                 {formatPrice(currentPrice)}
               </span>
-              <span className="text-xs text-[#888888]">
+              <span style={{ fontSize: "0.75rem", color: "var(--faint)" }}>
                 Ships in 3–5 working days
               </span>
             </div>
 
             <button
               onClick={handleAddToCart}
-              className={`w-full py-3.5 text-sm font-semibold rounded transition-all ${
-                added
-                  ? "bg-green-700/60 text-white"
-                  : "bg-[#d4a853] hover:bg-[#c49843] text-[#0a0a0a]"
-              }`}
+              style={{
+                width: "100%", padding: "0.875rem 1.5rem",
+                fontSize: "0.875rem", fontWeight: 600,
+                borderRadius: "3px", border: "none", cursor: "pointer",
+                transition: "background 0.2s, color 0.2s",
+                background: added ? "#3a6b3a" : "var(--ink)",
+                color: added ? "#ffffff" : "var(--paper)",
+                letterSpacing: "0.01em",
+              }}
             >
               {added ? "Added to cart ✓" : "Add to cart →"}
             </button>
@@ -128,7 +149,7 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
             {added && (
               <button
                 onClick={() => router.push("/checkout")}
-                className="w-full mt-2 py-2.5 text-sm text-[#d4a853] hover:underline"
+                style={{ width: "100%", marginTop: "0.6rem", padding: "0.6rem", fontSize: "0.85rem", background: "none", border: "none", cursor: "pointer", color: "var(--ink-2)", textDecoration: "underline", textUnderlineOffset: "3px" }}
               >
                 Proceed to checkout →
               </button>

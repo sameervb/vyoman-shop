@@ -18,41 +18,36 @@ export default function FormatSelector({
   onChange,
 }: FormatSelectorProps) {
   return (
-    <div className="space-y-2">
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
       {options.map((opt) => (
         <label
           key={opt}
-          className={`flex items-center justify-between cursor-pointer px-4 py-3 rounded border transition-colors ${
-            selected === opt
-              ? "border-[#d4a853] bg-[#d4a853]/5"
-              : "border-[#2a2a2a] hover:border-[#3a3a3a]"
-          }`}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            cursor: "pointer", padding: "0.65rem 0.875rem",
+            borderRadius: "3px", border: "1px solid",
+            borderColor: selected === opt ? "var(--ink)" : "var(--rule)",
+            background: selected === opt ? "rgba(22,21,15,0.04)" : "transparent",
+            transition: "border-color 0.15s, background 0.15s",
+          }}
         >
-          <div className="flex items-center gap-3">
-            <div
-              className={`w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors ${
-                selected === opt
-                  ? "border-[#d4a853]"
-                  : "border-[#888888]"
-              }`}
-            >
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            {/* Radio dot */}
+            <div style={{
+              width: "14px", height: "14px", borderRadius: "50%",
+              border: `2px solid ${selected === opt ? "var(--ink)" : "var(--rule)"}`,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              flexShrink: 0,
+            }}>
               {selected === opt && (
-                <div className="w-2 h-2 rounded-full bg-[#d4a853]" />
+                <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--ink)" }} />
               )}
             </div>
-            <span
-              className={`text-sm ${
-                selected === opt ? "text-[#f5f5f5]" : "text-[#888888]"
-              }`}
-            >
+            <span style={{ fontSize: "0.8125rem", color: selected === opt ? "var(--ink)" : "var(--ink-2)" }}>
               {PRODUCT_LABELS[opt]}
             </span>
           </div>
-          <span
-            className={`text-sm ${
-              selected === opt ? "text-[#d4a853]" : "text-[#888888]"
-            }`}
-          >
+          <span style={{ fontSize: "0.8125rem", color: selected === opt ? "var(--ink)" : "var(--faint)" }}>
             {formatPrice(prices[opt])}
           </span>
           <input
@@ -61,7 +56,7 @@ export default function FormatSelector({
             value={opt}
             checked={selected === opt}
             onChange={() => onChange(opt)}
-            className="sr-only"
+            style={{ position: "absolute", opacity: 0, width: 0, height: 0 }}
           />
         </label>
       ))}
