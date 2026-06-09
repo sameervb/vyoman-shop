@@ -12,8 +12,11 @@ export default function Navbar() {
   const drawerOpen = useCartStore((s) => s.drawerOpen);
   const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const [scrolled, setScrolled] = useState(false);
+  // Avoid SSR/client hydration mismatch: cart count only renders after mount
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const onScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -48,21 +51,27 @@ export default function Navbar() {
           padding: "0 clamp(1.25rem, 4vw, 2.5rem)", height: "100%",
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
-          {/* Wordmark */}
-          <Link href="https://vyomanaerials.com" style={{
-            fontFamily: "'Fraunces', Georgia, serif",
-            fontSize: "1.35rem", fontWeight: 440, letterSpacing: "-0.01em",
-            color: "var(--ink)",
-          }}>
-            Vyoman
+          {/* Wordmark → shop homepage */}
+          <Link href="/shop" style={{ display: "flex", flexDirection: "column", gap: "1px", textDecoration: "none" }}>
+            <span style={{
+              fontFamily: "'Fraunces', Georgia, serif",
+              fontSize: "1.35rem", fontWeight: 440, letterSpacing: "-0.01em",
+              color: "var(--ink)", lineHeight: 1,
+            }}>
+              Vyoman
+            </span>
+            <span style={{
+              fontSize: "0.6rem", fontWeight: 600, letterSpacing: "0.1em",
+              textTransform: "uppercase", color: "var(--faint)", lineHeight: 1,
+            }}>
+              Shop
+            </span>
           </Link>
 
           {/* Nav */}
           <div style={{ display: "flex", alignItems: "center", gap: "2.5rem" }}>
             {[
-              { href: "/shop", label: "Shop" },
-              { href: "/about", label: "About" },
-              { href: "https://vyomanaerials.com", label: "Gallery", external: true },
+              { href: "https://vyomanaerials.com", label: "Vyoman Aerials", external: true },
             ].map(({ href, label, external }) => {
               const active = !external && (pathname === href || pathname.startsWith(href + "/") || (href === "/shop" && pathname.startsWith("/product")));
               return external ? (
@@ -84,12 +93,12 @@ export default function Navbar() {
               style={{ position: "relative", display: "flex", alignItems: "center", gap: "6px", background: "none", border: "none", cursor: "pointer", color: "var(--ink-2)", transition: "color 0.2s" }}
               onMouseEnter={e => (e.currentTarget.style.color = "var(--ink)")}
               onMouseLeave={e => (e.currentTarget.style.color = "var(--ink-2)")}
-              aria-label={`Cart, ${itemCount} items`}
+              aria-label="Cart"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
               </svg>
-              {itemCount > 0 && (
+              {mounted && itemCount > 0 && (
                 <span style={{
                   background: "var(--ink)", color: "var(--paper)",
                   fontSize: "0.65rem", fontWeight: 600, borderRadius: "9999px",

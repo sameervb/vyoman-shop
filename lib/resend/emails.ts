@@ -22,12 +22,15 @@ function itemLines(items: OrderItem[]): string {
     .join("\n");
 }
 
+const SHOP_URL = "https://shop.vyomanaerials.com";
+
 export async function sendOrderConfirmation(
   order: Order,
   items: OrderItem[]
 ): Promise<void> {
   const resend = getResend();
   const orderNum = orderNumber(order.id);
+  const trackingUrl = `${SHOP_URL}/track/${order.id}`;
 
   await resend.emails.send({
     from: `Vyoman Shop <${FROM}>`,
@@ -52,9 +55,9 @@ ${order.shippingAddress.line1}${order.shippingAddress.line2 ? "\n" + order.shipp
 ${order.shippingAddress.city}, ${order.shippingAddress.postalCode}
 ${order.shippingAddress.country}
 
-We'll email you when your order ships. Usually 3–5 working days to Luxembourg, 5–7 days within the EU.
+Track your order: ${trackingUrl}
 
-View the collection: https://shop.vyomanaerials.com/shop
+We'll email you when your order ships. Usually 3–5 working days to Luxembourg, 5–7 days within the EU.
 
 —
 Vyoman · shop.vyomanaerials.com
@@ -68,17 +71,21 @@ export async function sendShippingNotification(
 ): Promise<void> {
   const resend = getResend();
   const orderNum = orderNumber(order.id);
+  const trackingUrl = `${SHOP_URL}/track/${order.id}`;
 
   await resend.emails.send({
     from: `Vyoman Shop <${FROM}>`,
     to: order.customerEmail,
-    subject: `Your Vyoman order is on its way`,
+    subject: `Your Vyoman order ${orderNum} is on its way`,
     text: `
 Hi ${order.customerName.split(" ")[0]},
 
 Your order ${orderNum} is on its way.
 
-${order.trackingNumber ? `Tracking number: ${order.trackingNumber}\nTrack here: ${order.trackingUrl ?? "—"}` : ""}
+${order.trackingNumber ? `Carrier tracking: ${order.trackingNumber}` : ""}
+${order.trackingUrl ? `Carrier link: ${order.trackingUrl}` : ""}
+
+Track your full order here: ${trackingUrl}
 
 ${itemLines(items)}
 

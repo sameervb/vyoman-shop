@@ -2,13 +2,15 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import { use } from "react";
 import { useCartStore } from "@/store/cart";
 
 interface Props {
   params: Promise<{ orderId: string }>;
 }
 
-export default function OrderConfirmedPage({ params: _params }: Props) {
+export default function OrderConfirmedPage({ params }: Props) {
+  const { orderId } = use(params);
   const clear = useCartStore((s) => s.clear);
 
   useEffect(() => {
@@ -41,19 +43,32 @@ export default function OrderConfirmedPage({ params: _params }: Props) {
         Your order is in — thank you.
       </p>
       <p style={{ fontSize: "0.875rem", lineHeight: 1.7, color: "var(--faint)", marginBottom: "2.5rem" }}>
-        We&apos;ll email you when it ships. Usually 3–5 working days to Luxembourg,
-        5–7 days within the EU.
+        We&apos;ve sent a confirmation to your email.
+        Usually 3–5 working days to Luxembourg, 5–7 days within the EU.
       </p>
 
-      <Link
-        href="/shop"
-        style={{
-          fontSize: "0.875rem", color: "var(--ink)", fontWeight: 500,
-          textDecoration: "underline", textUnderlineOffset: "3px",
-        }}
-      >
-        View the collection →
-      </Link>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem", alignItems: "center" }}>
+        <Link
+          href={`/track/${orderId}`}
+          style={{
+            display: "inline-block",
+            background: "var(--ink)", color: "var(--paper)",
+            padding: "0.8rem 2rem", borderRadius: "3px",
+            fontSize: "0.875rem", fontWeight: 600, letterSpacing: "0.01em",
+          }}
+        >
+          Track your order →
+        </Link>
+        <Link
+          href="/shop"
+          style={{
+            fontSize: "0.875rem", color: "var(--faint)",
+            textDecoration: "underline", textUnderlineOffset: "3px",
+          }}
+        >
+          View the collection
+        </Link>
+      </div>
     </div>
   );
 }
