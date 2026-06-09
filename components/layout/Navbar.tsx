@@ -9,7 +9,8 @@ import { useState, useEffect } from "react";
 export default function Navbar() {
   const pathname = usePathname();
   const itemCount = useCartStore((s) => s.itemCount());
-  const [cartOpen, setCartOpen] = useState(false);
+  const drawerOpen = useCartStore((s) => s.drawerOpen);
+  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -79,7 +80,7 @@ export default function Navbar() {
 
             {/* Cart */}
             <button
-              onClick={() => setCartOpen(true)}
+              onClick={() => setDrawerOpen(true)}
               style={{ position: "relative", display: "flex", alignItems: "center", gap: "6px", background: "none", border: "none", cursor: "pointer", color: "var(--ink-2)", transition: "color 0.2s" }}
               onMouseEnter={e => (e.currentTarget.style.color = "var(--ink)")}
               onMouseLeave={e => (e.currentTarget.style.color = "var(--ink-2)")}
@@ -105,7 +106,7 @@ export default function Navbar() {
       {/* Spacer */}
       <div style={{ height: "68px" }} />
 
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <CartDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
     </>
   );
 }

@@ -30,6 +30,52 @@ export const PRODUCT_LABELS: Record<ProductType, string> = {
   tote_bag: "Tote Bag",
 };
 
+export type ProductSpec = {
+  dimensions: string;
+  material: string;
+  extras: string;
+  shipping: string;
+};
+
+export const PRODUCT_SPECS: Record<ProductType, ProductSpec> = {
+  postcard_a6: {
+    dimensions: "148 × 105 mm (A6 landscape)",
+    material: "350 gsm silk coated card",
+    extras: "Blank back · address space · message field",
+    shipping: "3–5 working days",
+  },
+  matte_poster: {
+    dimensions: "30 × 45 cm (12 × 18 in)",
+    material: "200 gsm uncoated matte paper",
+    extras: "Ships rolled in protective tube",
+    shipping: "3–5 working days",
+  },
+  framed_print: {
+    dimensions: "30 × 40 cm (12 × 16 in)",
+    material: "200 gsm paper · black wood frame · plexiglass front",
+    extras: "Ready to hang · D-ring hardware included",
+    shipping: "5–7 working days",
+  },
+  canvas: {
+    dimensions: "40 × 60 cm (16 × 24 in)",
+    material: "Gallery-wrapped canvas · slim wood stretcher",
+    extras: "2 cm gallery wrap depth · ready to hang",
+    shipping: "5–7 working days",
+  },
+  mug: {
+    dimensions: "10 oz slim · 95 mm tall · 300 ml",
+    material: "White porcelain · sublimation ink",
+    extras: "Dishwasher safe · microwave safe",
+    shipping: "3–5 working days",
+  },
+  tote_bag: {
+    dimensions: "38 × 42 cm · 6 L capacity",
+    material: "Natural canvas · screen printed",
+    extras: "Machine washable · 10 kg load · short handles",
+    shipping: "3–5 working days",
+  },
+};
+
 export const PRODUCT_DESCRIPTIONS: Record<ProductType, string> = {
   postcard_a6:
     "A6 · 350 gsm silk coated. Blank back — add a personal message at checkout.",

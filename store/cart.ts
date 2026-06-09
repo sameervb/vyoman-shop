@@ -4,20 +4,29 @@ import type { CartItem } from "@/types/cart";
 
 interface CartStore {
   items: CartItem[];
+  drawerOpen: boolean;
   addItem: (item: CartItem) => void;
   removeItem: (id: string) => void;
   clear: () => void;
   itemCount: () => number;
   subtotalCents: () => number;
+  setDrawerOpen: (open: boolean) => void;
 }
 
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      drawerOpen: false,
 
+      // Replace any existing item with the same photo+productType (no accidental duplicates)
       addItem: (item) =>
-        set((state) => ({ items: [...state.items, item] })),
+        set((state) => {
+          const rest = state.items.filter(
+            (i) => !(i.photoSlug === item.photoSlug && i.productType === item.productType)
+          );
+          return { items: [...rest, item] };
+        }),
 
       removeItem: (id) =>
         set((state) => ({
@@ -25,6 +34,8 @@ export const useCartStore = create<CartStore>()(
         })),
 
       clear: () => set({ items: [] }),
+
+      setDrawerOpen: (open) => set({ drawerOpen: open }),
 
       itemCount: () => get().items.length,
 

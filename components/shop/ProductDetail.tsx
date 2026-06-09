@@ -1,30 +1,77 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import type { Photo, ProductType } from "@/types/catalog";
-import { PRODUCT_LABELS, PRODUCT_DESCRIPTIONS } from "@/types/catalog";
+import { PRODUCT_LABELS, PRODUCT_DESCRIPTIONS, PRODUCT_SPECS } from "@/types/catalog";
 import { formatPrice } from "@/lib/catalog";
 import { useCartStore } from "@/store/cart";
 import PersonaliseField from "./PersonaliseField";
 import FormatSelector from "./FormatSelector";
+import ProductMockup from "./ProductMockup";
+
+type GalleryView = "photo" | "mockup" | "specs";
 
 interface ProductDetailProps {
   photo: Photo;
 }
 
-export default function ProductDetail({ photo }: ProductDetailProps) {
-  const router = useRouter();
-  const addItem = useCartStore((s) => s.addItem);
-  const [selectedProduct, setSelectedProduct] = useState<ProductType>(
-    photo.availableProducts[0]
+// ── Spec row ─────────────────────────────────────────────────────────────────
+function SpecRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{ display: "flex", gap: "1rem", padding: "0.6rem 0", borderBottom: "1px solid var(--rule-2)" }}>
+      <span style={{ fontSize: "0.75rem", color: "var(--faint)", width: "90px", flexShrink: 0, paddingTop: "0.05rem", fontWeight: 500 }}>
+        {label}
+      </span>
+      <span style={{ fontSize: "0.8125rem", color: "var(--ink-2)", lineHeight: 1.5 }}>
+        {value}
+      </span>
+    </div>
   );
+}
+
+// ── Gallery tab pill ─────────────────────────────────────────────────────────
+function ViewPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: "0.3rem 0.75rem",
+        fontSize: "0.72rem", fontWeight: 500, letterSpacing: "0.04em",
+        textTransform: "uppercase",
+        background: active ? "var(--ink)" : "transparent",
+        color: active ? "var(--paper)" : "var(--ink-2)",
+        border: `1px solid ${active ? "var(--ink)" : "var(--rule)"}`,
+        borderRadius: "2px",
+        cursor: "pointer",
+        transition: "background 0.15s, color 0.15s, border-color 0.15s",
+      }}
+    >
+      {label}
+    </button>
+  );
+}
+
+export default function ProductDetail({ photo }: ProductDetailProps) {
+  const addItem = useCartStore((s) => s.addItem);
+  const setDrawerOpen = useCartStore((s) => s.setDrawerOpen);
+
+  const [selectedProduct, setSelectedProduct] = useState<ProductType>(photo.availableProducts[0]);
   const [personalisation, setPersonalisation] = useState("");
   const [added, setAdded] = useState(false);
+  const [galleryView, setGalleryView] = useState<GalleryView>("photo");
 
   const currentPrice = photo.prices[selectedProduct];
   const isPostcard = selectedProduct === "postcard_a6";
+  const isPortrait = photo.aspectRatio === "2:3";
+  const specs = PRODUCT_SPECS[selectedProduct];
+
+  // When the format changes, reset post-add state and stay on current gallery view
+  function handleFormatChange(pt: ProductType) {
+    setSelectedProduct(pt);
+    setAdded(false);
+  }
 
   function handleAddToCart() {
     addItem({
@@ -38,38 +85,87 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
       priceCents: currentPrice,
     });
     setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
   }
-
-  const isPortrait = photo.aspectRatio === "2:3";
 
   return (
     <div style={{ maxWidth: "1500px", margin: "0 auto", padding: "clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 2.5rem)" }}>
-      <div style={{ display: "grid", gridTemplateColumns: isPortrait ? "1fr 1fr" : "1.4fr 1fr", gap: "clamp(2rem, 5vw, 5rem)", alignItems: "start" }}
-        className="product-detail-grid">
-        {/* Left: Image */}
+      <div
+        style={{ display: "grid", gridTemplateColumns: isPortrait ? "1fr 1fr" : "1.4fr 1fr", gap: "clamp(2rem, 5vw, 5rem)", alignItems: "start" }}
+        className="product-detail-grid"
+      >
+        {/* ── Left: Gallery ──────────────────────────────────────────────── */}
         <div>
-          <div style={{
-            position: "relative",
-            aspectRatio: isPortrait ? "2/3" : "3/2",
-            borderRadius: "4px", overflow: "hidden",
-            background: "var(--rule-2)",
-          }}>
-            <Image
-              src={photo.displayImageUrl}
-              alt={photo.title}
-              fill
-              sizes="(max-width: 1024px) 100vw, 58vw"
-              className="object-cover"
-              priority
-            />
+          {/* View toggle pills */}
+          <div style={{ display: "flex", gap: "0.4rem", marginBottom: "0.875rem" }}>
+            <ViewPill label="Photo" active={galleryView === "photo"} onClick={() => setGalleryView("photo")} />
+            <ViewPill label="Preview" active={galleryView === "mockup"} onClick={() => setGalleryView("mockup")} />
+            <ViewPill label="Details" active={galleryView === "specs"} onClick={() => setGalleryView("specs")} />
           </div>
-          <p style={{ fontSize: "0.75rem", color: "var(--faint)", marginTop: "0.75rem" }}>
-            {photo.shotAt}
-          </p>
+
+          {/* Main display */}
+          <div style={{
+            borderRadius: "4px", overflow: "hidden",
+            background: galleryView === "specs" ? "var(--paper-2)" : "var(--rule-2)",
+            border: "1px solid var(--rule-2)",
+          }}>
+            {galleryView === "photo" && (
+              <div style={{ position: "relative", aspectRatio: isPortrait ? "2/3" : "3/2" }}>
+                <Image
+                  src={photo.displayImageUrl}
+                  alt={photo.title}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 58vw"
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            )}
+
+            {galleryView === "mockup" && (
+              <div style={{ aspectRatio: "3/2" }}>
+                <ProductMockup
+                  imageUrl={photo.displayImageUrl}
+                  alt={photo.title}
+                  productType={selectedProduct}
+                  aspectRatio={photo.aspectRatio}
+                />
+              </div>
+            )}
+
+            {galleryView === "specs" && (
+              <div style={{ padding: "1.5rem" }}>
+                <p style={{ fontSize: "0.7rem", letterSpacing: "0.12em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "1.25rem" }}>
+                  {PRODUCT_LABELS[selectedProduct]}
+                </p>
+                <SpecRow label="Size" value={specs.dimensions} />
+                <SpecRow label="Material" value={specs.material} />
+                <SpecRow label="Details" value={specs.extras} />
+                <SpecRow label="Ships in" value={specs.shipping} />
+                {isPostcard && (
+                  <div style={{ marginTop: "1.25rem", padding: "0.875rem", background: "rgba(22,21,15,0.03)", borderRadius: "3px", border: "1px solid var(--rule-2)" }}>
+                    <p style={{ fontSize: "0.8rem", color: "var(--ink-2)", lineHeight: 1.6 }}>
+                      Add a personal message at checkout — printed on the left half of the postcard back. Maximum 140 characters.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Shot metadata */}
+          {galleryView === "photo" && (
+            <p style={{ fontSize: "0.75rem", color: "var(--faint)", marginTop: "0.75rem" }}>
+              {photo.shotAt}
+            </p>
+          )}
+          {galleryView === "mockup" && (
+            <p style={{ fontSize: "0.75rem", color: "var(--faint)", marginTop: "0.75rem" }}>
+              Preview is illustrative — final print colours match the original photo.
+            </p>
+          )}
         </div>
 
-        {/* Right: Config */}
+        {/* ── Right: Config ─────────────────────────────────────────────── */}
         <div style={{ display: "flex", flexDirection: "column", paddingTop: "0.5rem" }}>
           {/* Title */}
           <div style={{ marginBottom: "2rem" }}>
@@ -98,7 +194,7 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
               options={photo.availableProducts}
               prices={photo.prices}
               selected={selectedProduct}
-              onChange={setSelectedProduct}
+              onChange={handleFormatChange}
             />
           </div>
 
@@ -113,10 +209,7 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
               <h2 style={{ fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "0.75rem" }}>
                 Message for the back
               </h2>
-              <PersonaliseField
-                value={personalisation}
-                onChange={setPersonalisation}
-              />
+              <PersonaliseField value={personalisation} onChange={setPersonalisation} />
             </div>
           )}
 
@@ -127,36 +220,84 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
                 {formatPrice(currentPrice)}
               </span>
               <span style={{ fontSize: "0.75rem", color: "var(--faint)" }}>
-                Ships in 3–5 working days
+                Ships in {specs.shipping}
               </span>
             </div>
 
-            <button
-              onClick={handleAddToCart}
-              style={{
-                width: "100%", padding: "0.875rem 1.5rem",
-                fontSize: "0.875rem", fontWeight: 600,
-                borderRadius: "3px", border: "none", cursor: "pointer",
-                transition: "background 0.2s, color 0.2s",
-                background: added ? "#3a6b3a" : "var(--ink)",
-                color: added ? "#ffffff" : "var(--paper)",
-                letterSpacing: "0.01em",
-              }}
-            >
-              {added ? "Added to cart ✓" : "Add to cart →"}
-            </button>
-
-            {added && (
+            {added ? (
+              /* ── Post-add UI ─────────────────────────────────────── */
+              <div>
+                <div style={{
+                  textAlign: "center", padding: "0.65rem",
+                  background: "rgba(63,185,80,0.08)", border: "1px solid rgba(63,185,80,0.22)",
+                  borderRadius: "3px", marginBottom: "0.75rem",
+                }}>
+                  <span style={{ fontSize: "0.8125rem", color: "#3a6b3a", fontWeight: 500 }}>
+                    Added to cart ✓
+                  </span>
+                </div>
+                <Link
+                  href="/checkout"
+                  style={{
+                    display: "block", width: "100%", background: "var(--ink)", color: "var(--paper)",
+                    textAlign: "center", padding: "0.875rem",
+                    fontSize: "0.875rem", fontWeight: 600, borderRadius: "3px",
+                    letterSpacing: "0.01em", marginBottom: "0.5rem",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  Proceed to checkout →
+                </Link>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <button
+                    onClick={() => setDrawerOpen(true)}
+                    style={{
+                      flex: 1, padding: "0.65rem",
+                      background: "none", border: "1px solid var(--rule)",
+                      borderRadius: "3px", fontSize: "0.8125rem",
+                      cursor: "pointer", color: "var(--ink-2)",
+                      transition: "border-color 0.15s",
+                    }}
+                  >
+                    View cart
+                  </button>
+                  <button
+                    onClick={() => setAdded(false)}
+                    style={{
+                      flex: 1, padding: "0.65rem",
+                      background: "none", border: "1px solid var(--rule)",
+                      borderRadius: "3px", fontSize: "0.8125rem",
+                      cursor: "pointer", color: "var(--ink-2)",
+                      transition: "border-color 0.15s",
+                    }}
+                  >
+                    Continue shopping
+                  </button>
+                </div>
+              </div>
+            ) : (
               <button
-                onClick={() => router.push("/checkout")}
-                style={{ width: "100%", marginTop: "0.6rem", padding: "0.6rem", fontSize: "0.85rem", background: "none", border: "none", cursor: "pointer", color: "var(--ink-2)", textDecoration: "underline", textUnderlineOffset: "3px" }}
+                onClick={handleAddToCart}
+                style={{
+                  width: "100%", padding: "0.875rem 1.5rem",
+                  fontSize: "0.875rem", fontWeight: 600,
+                  borderRadius: "3px", border: "none", cursor: "pointer",
+                  background: "var(--ink)", color: "var(--paper)",
+                  letterSpacing: "0.01em",
+                }}
               >
-                Proceed to checkout →
+                Add to cart →
               </button>
             )}
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .product-detail-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   );
 }

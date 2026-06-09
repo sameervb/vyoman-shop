@@ -4,6 +4,14 @@ import { useState } from "react";
 import type { Photo, ProductType } from "@/types/catalog";
 import ProductCard from "./ProductCard";
 
+// Map filter tab → which product mockup to show in cards
+const FILTER_MOCKUP: Record<string, ProductType | undefined> = {
+  all: undefined,
+  postcard_a6: "postcard_a6",
+  prints: "matte_poster",
+  gifts: "mug",
+};
+
 const FILTERS: { label: string; value: string }[] = [
   { label: "All", value: "all" },
   { label: "Postcards", value: "postcard_a6" },
@@ -63,7 +71,11 @@ export default function ProductGrid({ photos }: ProductGridProps) {
       {/* Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.25rem" }}>
         {filtered.map((photo) => (
-          <ProductCard key={photo.slug} photo={photo} />
+          <ProductCard
+            key={photo.slug}
+            photo={photo}
+            mockupType={FILTER_MOCKUP[activeFilter]}
+          />
         ))}
       </div>
 
