@@ -136,6 +136,47 @@ export const catalog: Photo[] = [
     prices: DEFAULT_PRICES,
   },
 
+  // ── The Yard in the Wood — Fond de Gras / Minett, June 2026 ─────────────────
+
+  {
+    slug: "rail-yard-ribbon",
+    title: "Fond de Gras · The Ribbon",
+    location: "Fond de Gras, Luxembourg",
+    description:
+      "Straight down onto the Lok Werkstatt at Fond de Gras. Heritage wagons on parallel tracks — a narrow ribbon of iron through dark Minett forest. The forest is winning.",
+    shotAt: "June 2026 · 80m altitude · Fond de Gras, Minett",
+    displayImageUrl: `${R2}/photos/rail-yard-ribbon.jpg`,
+    printFileKey: "print-files/rail-yard-ribbon-300dpi.jpg",
+    aspectRatio: "2:3",
+    availableProducts: [
+      "postcard_a6",
+      "matte_poster",
+      "framed_print",
+      "canvas",
+    ],
+    prices: DEFAULT_PRICES,
+  },
+  {
+    slug: "yard-sunset",
+    title: "Minett · End of Day",
+    location: "Fond de Gras, Luxembourg",
+    description:
+      "The sky above the Minett at the end of the second battery. Orange, red, violet — the whole band lit up for about six minutes. Whatever came before, this was the last frame of the evening.",
+    shotAt: "June 2026 · 120m altitude · Minett",
+    displayImageUrl: `${R2}/photos/yard-sunset.jpg`,
+    printFileKey: "print-files/yard-sunset-300dpi.jpg",
+    aspectRatio: "3:2",
+    availableProducts: [
+      "postcard_a6",
+      "matte_poster",
+      "framed_print",
+      "canvas",
+      "mug",
+      "tote_bag",
+    ],
+    prices: DEFAULT_PRICES,
+  },
+
   // ── Spring Awakening — Luxembourg / Ardennes, April 2026 ───────────────────
 
   {
