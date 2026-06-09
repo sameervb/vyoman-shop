@@ -52,38 +52,45 @@ function CheckoutForm({
       setError(stripeError.message ?? "Payment failed.");
       setPaying(false);
     }
-    // On success, Stripe redirects to return_url
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit}>
       <PaymentElement />
 
       {error && (
-        <p className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded px-4 py-3">
+        <p style={{ fontSize: "0.875rem", color: "#b91c1c", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "3px", padding: "0.75rem 1rem", marginTop: "1rem" }}>
           {error}
         </p>
       )}
 
-      <div className="pt-4 border-t border-[#2a2a2a] space-y-2 text-sm">
-        <div className="flex justify-between text-[#888888]">
-          <span>Subtotal</span>
-          <span>{formatPrice(subtotalCents)}</span>
+      <div style={{ paddingTop: "1.25rem", borderTop: "1px solid var(--rule-2)", marginTop: "1.5rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", marginBottom: "0.4rem" }}>
+          <span style={{ color: "var(--ink-2)" }}>Subtotal</span>
+          <span style={{ color: "var(--ink)" }}>{formatPrice(subtotalCents)}</span>
         </div>
-        <div className="flex justify-between text-[#888888]">
-          <span>Shipping</span>
-          <span>{formatPrice(shippingCents)}</span>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", marginBottom: "1rem" }}>
+          <span style={{ color: "var(--ink-2)" }}>Shipping</span>
+          <span style={{ color: "var(--ink)" }}>{formatPrice(shippingCents)}</span>
         </div>
-        <div className="flex justify-between text-[#f5f5f5] font-medium pt-1">
-          <span>Total</span>
-          <span>{formatPrice(totalCents)}</span>
+        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "1rem", fontWeight: 600, paddingTop: "0.75rem", borderTop: "1px solid var(--rule-2)" }}>
+          <span style={{ color: "var(--ink)" }}>Total</span>
+          <span style={{ fontFamily: "'Fraunces', Georgia, serif", color: "var(--ink)" }}>{formatPrice(totalCents)}</span>
         </div>
       </div>
 
       <button
         type="submit"
         disabled={paying || !stripe || !elements}
-        className="w-full bg-[#d4a853] hover:bg-[#c49843] disabled:opacity-50 disabled:cursor-not-allowed text-[#0a0a0a] text-sm font-semibold py-3.5 rounded transition-colors"
+        style={{
+          width: "100%", marginTop: "1.5rem",
+          background: paying ? "var(--ink-2)" : "var(--ink)",
+          color: "var(--paper)", padding: "0.875rem",
+          fontSize: "0.875rem", fontWeight: 600, borderRadius: "3px",
+          border: "none", cursor: paying ? "not-allowed" : "pointer",
+          transition: "background 0.2s", letterSpacing: "0.01em",
+          opacity: paying ? 0.7 : 1,
+        }}
       >
         {paying ? "Processing…" : `Pay ${formatPrice(totalCents)} →`}
       </button>
@@ -91,7 +98,7 @@ function CheckoutForm({
   );
 }
 
-// ── Shipping + contact fields ────────────────────────────────────
+// ── Shipping fields ───────────────────────────────────────────────
 interface ShippingData {
   email: string;
   firstName: string;
@@ -103,56 +110,55 @@ interface ShippingData {
   country: string;
 }
 
-function ShippingFields({
-  data,
-  onChange,
-}: {
-  data: ShippingData;
-  onChange: (data: ShippingData) => void;
-}) {
-  const field = (name: keyof ShippingData, label: string, required = true, type = "text") => (
+const inputStyle = {
+  width: "100%", background: "var(--paper-2)", border: "1px solid var(--rule)",
+  borderRadius: "3px", padding: "0.65rem 0.875rem",
+  fontSize: "0.875rem", color: "var(--ink)",
+  fontFamily: "inherit", outline: "none", boxSizing: "border-box" as const,
+  transition: "border-color 0.15s",
+};
+
+const labelStyle = { display: "block", fontSize: "0.75rem", color: "var(--faint)", marginBottom: "0.4rem", fontWeight: 500 };
+
+function ShippingFields({ data, onChange }: { data: ShippingData; onChange: (d: ShippingData) => void }) {
+  const f = (name: keyof ShippingData, label: string, required = true, type = "text") => (
     <div>
-      <label className="block text-xs text-[#888888] mb-1.5">{label}</label>
+      <label style={labelStyle}>{label}</label>
       <input
-        type={type}
-        required={required}
+        type={type} required={required}
         value={data[name]}
         onChange={(e) => onChange({ ...data, [name]: e.target.value })}
-        autoComplete={name === "email" ? "email" : name === "line1" ? "address-line1" : name === "line2" ? "address-line2" : name === "city" ? "address-level2" : name === "postalCode" ? "postal-code" : name === "country" ? "country" : "off"}
-        className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded px-4 py-3 text-sm text-[#f5f5f5] placeholder-[#555555] focus:outline-none focus:border-[#d4a853] transition-colors"
+        style={inputStyle}
+        onFocus={(e) => (e.target.style.borderColor = "var(--ink)")}
+        onBlur={(e) => (e.target.style.borderColor = "var(--rule)")}
       />
     </div>
   );
 
   return (
-    <div className="space-y-4">
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <div>
-        <h2 className="text-xs font-medium text-[#888888] uppercase tracking-wider mb-3">
-          Contact
-        </h2>
-        {field("email", "Email address", true, "email")}
+        <p style={{ fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "0.75rem" }}>Contact</p>
+        {f("email", "Email address", true, "email")}
       </div>
-
       <div>
-        <h2 className="text-xs font-medium text-[#888888] uppercase tracking-wider mb-3 mt-6">
-          Shipping address
-        </h2>
-        <div className="grid grid-cols-2 gap-3">
-          {field("firstName", "First name")}
-          {field("lastName", "Last name")}
+        <p style={{ fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "0.75rem", marginTop: "0.5rem" }}>Shipping address</p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+          {f("firstName", "First name")}
+          {f("lastName", "Last name")}
         </div>
-        <div className="mt-3">{field("line1", "Address")}</div>
-        <div className="mt-3">{field("line2", "Apartment, suite (optional)", false)}</div>
-        <div className="grid grid-cols-2 gap-3 mt-3">
-          {field("city", "City")}
-          {field("postalCode", "Postal code")}
+        <div style={{ marginTop: "0.75rem" }}>{f("line1", "Address")}</div>
+        <div style={{ marginTop: "0.75rem" }}>{f("line2", "Apartment, suite (optional)", false)}</div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginTop: "0.75rem" }}>
+          {f("city", "City")}
+          {f("postalCode", "Postal code")}
         </div>
-        <div className="mt-3">
-          <label className="block text-xs text-[#888888] mb-1.5">Country</label>
+        <div style={{ marginTop: "0.75rem" }}>
+          <label style={labelStyle}>Country</label>
           <select
             value={data.country}
             onChange={(e) => onChange({ ...data, country: e.target.value })}
-            className="w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded px-4 py-3 text-sm text-[#f5f5f5] focus:outline-none focus:border-[#d4a853] transition-colors"
+            style={{ ...inputStyle, cursor: "pointer" }}
           >
             <option value="LU">Luxembourg</option>
             <option value="BE">Belgium</option>
@@ -183,14 +189,8 @@ export default function CheckoutPage() {
   const subtotalCents = useCartStore((s) => s.subtotalCents());
 
   const [shipping, setShipping] = useState<ShippingData>({
-    email: "",
-    firstName: "",
-    lastName: "",
-    line1: "",
-    line2: "",
-    city: "",
-    postalCode: "",
-    country: "LU",
+    email: "", firstName: "", lastName: "",
+    line1: "", line2: "", city: "", postalCode: "", country: "LU",
   });
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -200,7 +200,6 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  // Redirect if cart is empty
   useEffect(() => {
     if (items.length === 0) router.replace("/shop");
   }, [items.length, router]);
@@ -252,18 +251,20 @@ export default function CheckoutPage() {
   if (items.length === 0) return null;
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-12">
-      <h1 className="text-lg font-light text-[#f5f5f5] mb-10">Checkout</h1>
+    <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "clamp(5rem, 8vw, 7rem) clamp(1.25rem, 4vw, 2.5rem) 4rem" }}>
+      <h1 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 360, fontSize: "clamp(1.6rem, 3vw, 2rem)", letterSpacing: "-0.01em", color: "var(--ink)", marginBottom: "2.5rem" }}>
+        Checkout
+      </h1>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: "3rem" }} className="checkout-grid">
         {/* Left: Form */}
         <div>
           {!clientSecret ? (
-            <form onSubmit={handleContinueToPayment} className="space-y-6">
+            <form onSubmit={handleContinueToPayment}>
               <ShippingFields data={shipping} onChange={setShipping} />
 
               {formError && (
-                <p className="text-sm text-red-400 bg-red-400/10 border border-red-400/20 rounded px-4 py-3">
+                <p style={{ fontSize: "0.875rem", color: "#b91c1c", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: "3px", padding: "0.75rem 1rem", marginTop: "1rem" }}>
                   {formError}
                 </p>
               )}
@@ -271,7 +272,13 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#d4a853] hover:bg-[#c49843] disabled:opacity-50 text-[#0a0a0a] text-sm font-semibold py-3.5 rounded transition-colors mt-4"
+                style={{
+                  width: "100%", marginTop: "1.75rem",
+                  background: "var(--ink)", color: "var(--paper)",
+                  padding: "0.875rem", fontSize: "0.875rem", fontWeight: 600,
+                  borderRadius: "3px", border: "none", cursor: loading ? "not-allowed" : "pointer",
+                  opacity: loading ? 0.7 : 1, letterSpacing: "0.01em",
+                }}
               >
                 {loading ? "Getting shipping quote…" : "Continue to payment →"}
               </button>
@@ -282,78 +289,72 @@ export default function CheckoutPage() {
               options={{
                 clientSecret,
                 appearance: {
-                  theme: "night",
+                  theme: "stripe",
                   variables: {
-                    colorPrimary: "#d4a853",
-                    colorBackground: "#1a1a1a",
-                    colorText: "#f5f5f5",
-                    colorDanger: "#f85149",
-                    fontFamily: "var(--font-geist-sans), Arial, sans-serif",
-                    borderRadius: "4px",
+                    colorPrimary: "#16150F",
+                    colorBackground: "#FAF8F3",
+                    colorText: "#16150F",
+                    colorTextSecondary: "#5E5A50",
+                    colorDanger: "#b91c1c",
+                    fontFamily: "'Hanken Grotesk', ui-sans-serif, Arial, sans-serif",
+                    borderRadius: "3px",
                   },
                 },
               }}
             >
-              <CheckoutForm
-                orderId={orderId!}
-                totalCents={totalCents}
-                shippingCents={shippingCents}
-              />
+              <CheckoutForm orderId={orderId!} totalCents={totalCents} shippingCents={shippingCents} />
             </Elements>
           )}
         </div>
 
         {/* Right: Order summary */}
-        <div className="lg:pl-8 lg:border-l lg:border-[#2a2a2a]">
-          <h2 className="text-xs font-medium text-[#888888] uppercase tracking-wider mb-6">
+        <div style={{ borderTop: "1px solid var(--rule-2)", paddingTop: "2rem" }}>
+          <p style={{ fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "1.25rem" }}>
             Order summary
-          </h2>
-          <ul className="space-y-4">
+          </p>
+          <ul style={{ listStyle: "none", display: "flex", flexDirection: "column", gap: "1rem" }}>
             {items.map((item) => (
-              <li key={item.id} className="flex gap-4">
-                <div className="relative w-14 h-10 rounded overflow-hidden flex-shrink-0 bg-[#1a1a1a]">
+              <li key={item.id} style={{ display: "flex", gap: "0.875rem", alignItems: "flex-start" }}>
+                <div style={{ position: "relative", width: "56px", height: "40px", borderRadius: "3px", overflow: "hidden", flexShrink: 0, background: "var(--rule-2)" }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.photoDisplayUrl}
-                    alt={item.photoTitle}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={item.photoDisplayUrl} alt={item.photoTitle} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-[#f5f5f5] truncate">
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ fontSize: "0.875rem", color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {item.photoTitle}
                   </p>
-                  <p className="text-xs text-[#888888]">
+                  <p style={{ fontSize: "0.75rem", color: "var(--ink-2)", marginTop: "0.2rem" }}>
                     {PRODUCT_LABELS[item.productType]}
                   </p>
                 </div>
-                <span className="text-sm text-[#f5f5f5] flex-shrink-0">
+                <span style={{ fontSize: "0.875rem", color: "var(--ink)", flexShrink: 0 }}>
                   {formatPrice(item.priceCents)}
                 </span>
               </li>
             ))}
           </ul>
 
-          <div className="mt-6 pt-6 border-t border-[#2a2a2a] space-y-2 text-sm">
-            <div className="flex justify-between">
-              <span className="text-[#888888]">Subtotal</span>
-              <span className="text-[#f5f5f5]">{formatPrice(subtotalCents)}</span>
+          <div style={{ marginTop: "1.5rem", paddingTop: "1.5rem", borderTop: "1px solid var(--rule-2)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem", marginBottom: "0.4rem" }}>
+              <span style={{ color: "var(--ink-2)" }}>Subtotal</span>
+              <span style={{ color: "var(--ink)" }}>{formatPrice(subtotalCents)}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-[#888888]">Shipping</span>
-              <span className="text-[#888888]">
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.875rem" }}>
+              <span style={{ color: "var(--ink-2)" }}>Shipping</span>
+              <span style={{ color: "var(--ink-2)" }}>
                 {shippingCents > 0 ? formatPrice(shippingCents) : "Calculated next step"}
               </span>
             </div>
-            {totalCents > subtotalCents && (
-              <div className="flex justify-between font-medium pt-1 border-t border-[#2a2a2a]">
-                <span className="text-[#f5f5f5]">Total</span>
-                <span className="text-[#f5f5f5]">{formatPrice(totalCents)}</span>
-              </div>
-            )}
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media (min-width: 900px) {
+          .checkout-grid { grid-template-columns: 1.1fr 0.9fr !important; }
+          .checkout-grid > div:last-child { border-top: none !important; padding-top: 0 !important; border-left: 1px solid var(--rule-2); padding-left: 3rem; }
+        }
+      `}</style>
     </div>
   );
 }
