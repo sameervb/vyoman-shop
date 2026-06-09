@@ -3,13 +3,12 @@
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Photo, ProductType, FrameOption } from "@/types/catalog";
+import type { Photo, ProductType } from "@/types/catalog";
 import { PRODUCT_LABELS, PRODUCT_DESCRIPTIONS } from "@/types/catalog";
 import { formatPrice } from "@/lib/catalog";
 import { useCartStore } from "@/store/cart";
 import PersonaliseField from "./PersonaliseField";
 import FormatSelector from "./FormatSelector";
-import FrameSelector from "./FrameSelector";
 
 interface ProductDetailProps {
   photo: Photo;
@@ -21,15 +20,11 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
   const [selectedProduct, setSelectedProduct] = useState<ProductType>(
     photo.availableProducts[0]
   );
-  const [frameOption, setFrameOption] = useState<FrameOption>("black");
   const [personalisation, setPersonalisation] = useState("");
   const [added, setAdded] = useState(false);
 
   const currentPrice = photo.prices[selectedProduct];
   const isPostcard = selectedProduct === "postcard_a6";
-  const isFramed =
-    selectedProduct === "print_a4_framed" ||
-    selectedProduct === "print_a3_framed";
 
   function handleAddToCart() {
     addItem({
@@ -38,7 +33,7 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
       photoTitle: photo.title,
       photoDisplayUrl: photo.displayImageUrl,
       productType: selectedProduct,
-      frameOption: isFramed ? frameOption : undefined,
+      frameOption: undefined,
       personalisation: isPostcard && personalisation ? personalisation : undefined,
       priceCents: currentPrice,
     });
@@ -51,7 +46,7 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
         {/* Left: Image */}
         <div>
-          <div className="relative aspect-[3/2] rounded overflow-hidden bg-[#1a1a1a]">
+          <div className={`relative ${photo.aspectRatio === "2:3" ? "aspect-[2/3]" : "aspect-[3/2]"} rounded overflow-hidden bg-[#1a1a1a]`}>
             <Image
               src={photo.displayImageUrl}
               alt={photo.title}
@@ -94,16 +89,6 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
           <p className="text-xs text-[#888888] mb-6">
             {PRODUCT_DESCRIPTIONS[selectedProduct]}
           </p>
-
-          {/* Frame selector (only for framed prints) */}
-          {isFramed && (
-            <div className="mb-6">
-              <h2 className="text-xs font-medium text-[#888888] uppercase tracking-wider mb-3">
-                Frame
-              </h2>
-              <FrameSelector selected={frameOption} onChange={setFrameOption} />
-            </div>
-          )}
 
           {/* Personalisation (only for postcards) */}
           {isPostcard && (

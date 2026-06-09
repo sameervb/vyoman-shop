@@ -7,8 +7,8 @@ import ProductCard from "./ProductCard";
 const FILTERS: { label: string; value: string }[] = [
   { label: "All", value: "all" },
   { label: "Postcards", value: "postcard_a6" },
-  { label: "Prints", value: "print_a4_unframed" },
-  { label: "Stickers", value: "sticker_pack" },
+  { label: "Prints & Canvas", value: "prints" },
+  { label: "Gifts", value: "gifts" },
 ];
 
 interface ProductGridProps {
@@ -23,13 +23,15 @@ export default function ProductGrid({ photos }: ProductGridProps) {
       ? photos
       : photos.filter((p) =>
           p.availableProducts.some((pt: ProductType) => {
-            if (activeFilter === "print_a4_unframed") {
+            if (activeFilter === "prints") {
               return (
-                pt === "print_a4_unframed" ||
-                pt === "print_a4_framed" ||
-                pt === "print_a3_unframed" ||
-                pt === "print_a3_framed"
+                pt === "matte_poster" ||
+                pt === "framed_print" ||
+                pt === "canvas"
               );
+            }
+            if (activeFilter === "gifts") {
+              return pt === "mug" || pt === "tote_bag";
             }
             return pt === activeFilter;
           })

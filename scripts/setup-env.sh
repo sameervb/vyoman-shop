@@ -10,7 +10,6 @@ cd "$(dirname "$0")/.."
 
 ENV_FILE=".env.local"
 SCOPE="sameerbh08-7088s-projects"
-ENVS=("production" "preview")
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "❌  .env.local not found"
@@ -26,7 +25,7 @@ if grep -q "^[^#].*=FILL_IN" "$ENV_FILE"; then
   exit 1
 fi
 
-echo "📦  Pushing env vars to Vercel (production + preview)..."
+echo "📦  Pushing env vars to Vercel (production only)..."
 
 while IFS= read -r line; do
   # Skip blank lines and comments
@@ -39,15 +38,14 @@ while IFS= read -r line; do
   [[ -z "$KEY" || -z "$VAL" ]] && continue
 
   echo "  → $KEY"
-  for env in "${ENVS[@]}"; do
-    printf '%s' "$VAL" | vercel env add "$KEY" "$env" \
-      --scope "$SCOPE" --force 2>/dev/null || \
-    printf '%s' "$VAL" | vercel env add "$KEY" "$env" \
-      --scope "$SCOPE" 2>/dev/null || true
-  done
+  vercel env add "$KEY" production \
+    --value "$VAL" \
+    --scope "$SCOPE" \
+    --force \
+    --yes 2>/dev/null || true
 
 done < "$ENV_FILE"
 
 echo ""
-echo "✅  Done. Triggering a redeploy..."
-vercel --prod --yes --scope "$SCOPE" 2>&1 | tail -5
+echo "✅  Done. Triggering production redeploy..."
+vercel --prod --yes --scope "$SCOPE" 2>&1 | tail -3

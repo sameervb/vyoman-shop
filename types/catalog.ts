@@ -1,10 +1,10 @@
 export type ProductType =
   | "postcard_a6"
-  | "print_a4_unframed"
-  | "print_a4_framed"
-  | "print_a3_unframed"
-  | "print_a3_framed"
-  | "sticker_pack";
+  | "matte_poster"
+  | "framed_print"
+  | "canvas"
+  | "mug"
+  | "tote_bag";
 
 export type FrameOption = "black" | "white";
 
@@ -22,19 +22,23 @@ export type Photo = {
 };
 
 export const PRODUCT_LABELS: Record<ProductType, string> = {
-  postcard_a6: "Postcard (A6)",
-  print_a4_unframed: "A4 Print · Unframed",
-  print_a4_framed: "A4 Print · Framed",
-  print_a3_unframed: "A3 Print · Unframed",
-  print_a3_framed: "A3 Print · Framed",
-  sticker_pack: "Sticker Pack (5 stickers)",
+  postcard_a6: "Postcard A6",
+  matte_poster: "Matte Poster · 30×45 cm",
+  framed_print: "Framed Print · 30×40 cm",
+  canvas: "Canvas · 40×60 cm",
+  mug: "Mug · 10 oz",
+  tote_bag: "Tote Bag",
 };
 
 export const PRODUCT_DESCRIPTIONS: Record<ProductType, string> = {
-  postcard_a6: "A6 glossy, 300gsm. Add a personal message for the back.",
-  print_a4_unframed: "210 × 297mm, 170gsm enhanced matte.",
-  print_a4_framed: "210 × 297mm, 170gsm, solid wood frame.",
-  print_a3_unframed: "297 × 420mm, 170gsm enhanced matte.",
-  print_a3_framed: "297 × 420mm, 170gsm, solid wood frame.",
-  sticker_pack: "5 die-cut vinyl stickers, outdoor durable.",
+  postcard_a6:
+    "A6 · 350 gsm silk coated. Blank back — add a personal message at checkout.",
+  matte_poster:
+    "30×45 cm · 200 gsm uncoated matte. Ships rolled in a protective tube.",
+  framed_print:
+    "30×40 cm · 200 gsm uncoated, black wood frame with plexiglass. Ready to hang.",
+  canvas:
+    "40×60 cm · gallery-wrapped canvas, slim wood frame. Ready to hang.",
+  mug: "10 oz slim porcelain mug. Dishwasher safe.",
+  tote_bag: "Standard tote, natural canvas, black print. 38×42 cm.",
 };

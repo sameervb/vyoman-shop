@@ -1,53 +1,42 @@
-import type { FrameOption, ProductType } from "@/types/catalog";
+import type { ProductType } from "@/types/catalog";
+
+export type PrintOrientation = "landscape" | "portrait";
 
 /**
- * Gelato product UIDs — verify against Gelato catalog API before go-live.
- * https://dashboard.gelato.com/products
+ * Gelato product UIDs — verified against Gelato catalog API, June 2026.
+ * Landscape-default UIDs listed. postcard_a6 has a separate portrait variant
+ * handled in getGelatoProductUid.
  */
 export const GELATO_PRODUCT_UIDS: Record<ProductType, string> = {
   postcard_a6:
-    "cards_pf_a6_pt_350-gsm-gloss-coated_cl_4-4_hor",
-  print_a4_unframed:
-    "poster_pf_a4_pt_170-gsm-enhanced-matte_cl_4-0",
-  print_a4_framed:
-    "framed_poster_pf_a4_pt_170gsm_cl_4-0_fr_black", // default; override with frame option
-  print_a3_unframed:
-    "poster_pf_a3_pt_170-gsm-enhanced-matte_cl_4-0",
-  print_a3_framed:
-    "framed_poster_pf_a3_pt_170gsm_cl_4-0_fr_black", // default
-  sticker_pack:
-    "sticker_pf_60x60_pt_gloss-uv_cl_4-0",
+    "cards_pf_a6_pt_350-gsm-coated-silk_cl_4-4_hor",
+  matte_poster:
+    "flat_300x450-mm-12x18-inch_200-gsm-80lb-uncoated_4-0_ver",
+  framed_print:
+    "framed_poster_300x400-mm-12x16-inch_black_wood_w12xt22-mm_plexiglass_300x400-mm-12x16-inch_200-gsm-80lb-uncoated_4-0_hor",
+  canvas:
+    "canvas_s_product_cf_400x600-mm_cm_canvas_cthck_wood-fsc-slim_cl_4-0_hor",
+  mug:
+    "mug_product_msz_10-oz-slim_mmat_porcelain-white_cl_4-0",
+  tote_bag:
+    "bag_product_bsc_tote-bag_bqa_clc_bsi_std-t_bco_black_bpr_0-4",
 };
 
-export const GELATO_FRAMED_VARIANTS: Partial<
-  Record<ProductType, Record<FrameOption, string>>
-> = {
-  print_a4_framed: {
-    black: "framed_poster_pf_a4_pt_170gsm_cl_4-0_fr_black",
-    white: "framed_poster_pf_a4_pt_170gsm_cl_4-0_fr_white",
-  },
-  print_a3_framed: {
-    black: "framed_poster_pf_a3_pt_170gsm_cl_4-0_fr_black",
-    white: "framed_poster_pf_a3_pt_170gsm_cl_4-0_fr_white",
-  },
-};
+/** Portrait variant of A6 postcard — for 2:3 photos */
+const POSTCARD_A6_PORTRAIT_UID =
+  "cards_pf_a6_pt_350-gsm-coated-silk_cl_4-4_ver";
 
 export function getGelatoProductUid(
   productType: ProductType,
-  frameOption?: FrameOption
+  orientation: PrintOrientation = "landscape"
 ): string {
-  if (
-    frameOption &&
-    (productType === "print_a4_framed" || productType === "print_a3_framed")
-  ) {
-    return GELATO_FRAMED_VARIANTS[productType]?.[frameOption] ??
-      GELATO_PRODUCT_UIDS[productType];
+  if (productType === "postcard_a6" && orientation === "portrait") {
+    return POSTCARD_A6_PORTRAIT_UID;
   }
   return GELATO_PRODUCT_UIDS[productType];
 }
 
-/** How many Gelato line items to create for each product type */
-export function getGelatoQuantity(productType: ProductType): number {
-  if (productType === "sticker_pack") return 5; // 5 stickers per pack
+/** One Gelato line item per cart item for all current product types. */
+export function getGelatoQuantity(_productType: ProductType): number {
   return 1;
 }

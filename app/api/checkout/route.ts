@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe/client";
 import { db, orders, orderItems } from "@/lib/db";
 import { getShippingQuote } from "@/lib/gelato/client";
-import { getGelatoProductUid } from "@/lib/gelato/products";
+import { getGelatoProductUid, type PrintOrientation } from "@/lib/gelato/products";
 import { getPhotoBySlug } from "@/lib/catalog";
 import type { CheckoutRequest } from "@/types/orders";
 
@@ -35,7 +35,10 @@ export async function POST(req: NextRequest) {
       validatedItems.push({
         ...item,
         priceCents,
-        gelatoProductId: getGelatoProductUid(item.productType, item.frameOption),
+        gelatoProductId: getGelatoProductUid(
+          item.productType,
+          (photo.aspectRatio === "2:3" ? "portrait" : "landscape") as PrintOrientation
+        ),
       });
     }
 

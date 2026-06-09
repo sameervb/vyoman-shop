@@ -1,5 +1,6 @@
 import type { Order, OrderItem } from "@/types/orders";
-import { getGelatoProductUid, getGelatoQuantity } from "./products";
+import { getGelatoProductUid, getGelatoQuantity, type PrintOrientation } from "./products";
+import { getPhotoBySlug } from "@/lib/catalog";
 
 const GELATO_API_BASE = "https://order.gelatoapis.com";
 
@@ -81,9 +82,13 @@ export async function placeGelatoOrder(
             ]
           : [{ type: "default", url: front }];
 
+      const photo = getPhotoBySlug(item.photoSlug);
+      const orientation: PrintOrientation =
+        photo?.aspectRatio === "2:3" ? "portrait" : "landscape";
+
       return {
         itemReferenceId: item.id,
-        productUid: getGelatoProductUid(item.productType, item.frameOption),
+        productUid: getGelatoProductUid(item.productType, orientation),
         files,
         quantity: getGelatoQuantity(item.productType),
       };
