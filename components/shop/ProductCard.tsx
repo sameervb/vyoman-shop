@@ -1,17 +1,30 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Photo, ProductType } from "@/types/catalog";
-import { formatPrice, getMinPrice } from "@/lib/catalog";
+import { formatPrice } from "@/lib/catalog";
 import ProductMockup from "./ProductMockup";
 
 interface ProductCardProps {
   photo: Photo;
-  /** When set, renders the photo as this product mockup instead of plain aerial image. */
+  /** When set, renders the photo as this product mockup instead of plain image */
   mockupType?: ProductType;
+  /** Subtitle shown below the title (product label when filtered, location for All) */
+  subtitle?: string;
+  /** Price to display (category-scoped min, pre-computed by ProductGrid) */
+  price?: number;
+  /** Whether to prefix the price with "from " */
+  showFrom?: boolean;
 }
 
-export default function ProductCard({ photo, mockupType }: ProductCardProps) {
-  const minPrice = getMinPrice(photo);
+export default function ProductCard({
+  photo,
+  mockupType,
+  subtitle,
+  price,
+  showFrom = true,
+}: ProductCardProps) {
+  const displayPrice = price ?? Math.min(...photo.availableProducts.map((pt) => photo.prices[pt]));
+  const displaySubtitle = subtitle ?? photo.location;
 
   return (
     <Link
@@ -36,6 +49,7 @@ export default function ProductCard({ photo, mockupType }: ProductCardProps) {
             alt={photo.title}
             productType={mockupType}
             aspectRatio={photo.aspectRatio}
+            location={photo.location}
           />
         ) : (
           <Image
@@ -56,10 +70,10 @@ export default function ProductCard({ photo, mockupType }: ProductCardProps) {
           {photo.title}
         </h3>
         <p style={{ fontSize: "0.75rem", color: "var(--ink-2)", marginTop: "0.2rem" }}>
-          {photo.location}
+          {displaySubtitle}
         </p>
         <p style={{ fontSize: "0.8rem", color: "var(--faint)", marginTop: "0.6rem" }}>
-          from {formatPrice(minPrice)}
+          {showFrom ? "from " : ""}{formatPrice(displayPrice)}
         </p>
       </div>
 

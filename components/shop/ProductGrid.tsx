@@ -2,15 +2,11 @@
 
 import { useState } from "react";
 import type { Photo, ProductType } from "@/types/catalog";
+import { PRODUCT_LABELS } from "@/types/catalog";
+import { getFilteredMinPrice } from "@/lib/catalog";
 import ProductCard from "./ProductCard";
 
-// Map filter tab → which product mockup to show in cards
-const FILTER_MOCKUP: Record<string, ProductType | undefined> = {
-  all: undefined,
-  postcard_a6: "postcard_a6",
-  prints: "matte_poster",
-  gifts: "mug",
-};
+// ── Filter definitions ────────────────────────────────────────────────────────
 
 const FILTERS: { label: string; value: string }[] = [
   { label: "All", value: "all" },
@@ -19,24 +15,66 @@ const FILTERS: { label: string; value: string }[] = [
   { label: "Gifts", value: "gifts" },
 ];
 
-interface ProductGridProps {
-  photos: Photo[];
+const PRINT_TYPES: ProductType[] = ["matte_poster", "framed_print", "canvas"];
+const GIFT_TYPES: ProductType[] = ["mug", "tote_bag"];
+
+/** Pick the best mockup product for a photo given the active filter.
+ *  Checks what the photo actually carries — never shows a mockup for a
+ *  product the photo doesn't have. */
+function getPhotoMockup(photo: Photo, filter: string): ProductType | undefined {
+  if (filter === "all") return undefined;
+  if (filter === "postcard_a6") {
+    return photo.availableProducts.includes("postcard_a6") ? "postcard_a6" : undefined;
+  }
+  if (filter === "prints") {
+    for (const pt of PRINT_TYPES) {
+      if (photo.availableProducts.includes(pt)) return pt;
+    }
+    return undefined;
+  }
+  if (filter === "gifts") {
+    // Prefer mug; fall back to tote_bag — whichever this photo actually has
+    if (photo.availableProducts.includes("mug")) return "mug";
+    if (photo.availableProducts.includes("tote_bag")) return "tote_bag";
+    return undefined;
+  }
+  return undefined;
 }
 
-export default function ProductGrid({ photos }: ProductGridProps) {
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+/** Price shown on the card: minimum within the filtered category only. */
+function getCardPrice(photo: Photo, filter: string): number {
+  if (filter === "all") {
+    return Math.min(...photo.availableProducts.map((pt) => photo.prices[pt]));
+  }
+  if (filter === "postcard_a6") return getFilteredMinPrice(photo, ["postcard_a6"]);
+  if (filter === "prints") return getFilteredMinPrice(photo, PRINT_TYPES);
+  if (filter === "gifts") return getFilteredMinPrice(photo, GIFT_TYPES);
+  return Math.min(...photo.availableProducts.map((pt) => photo.prices[pt]));
+}
+
+/** Subtitle shown on the card: product label when filtered, location when All. */
+function getCardSubtitle(photo: Photo, filter: string, mockupType: ProductType | undefined): string {
+  if (filter === "all" || !mockupType) return photo.location;
+  return PRODUCT_LABELS[mockupType];
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
+
+interface ProductGridProps {
+  photos: Photo[];
+  initialFilter?: string;
+}
+
+export default function ProductGrid({ photos, initialFilter = "all" }: ProductGridProps) {
+  const [activeFilter, setActiveFilter] = useState<string>(initialFilter);
 
   const filtered =
     activeFilter === "all"
       ? photos
       : photos.filter((p) =>
           p.availableProducts.some((pt: ProductType) => {
-            if (activeFilter === "prints") {
-              return pt === "matte_poster" || pt === "framed_print" || pt === "canvas";
-            }
-            if (activeFilter === "gifts") {
-              return pt === "mug" || pt === "tote_bag";
-            }
+            if (activeFilter === "prints") return PRINT_TYPES.includes(pt);
+            if (activeFilter === "gifts") return GIFT_TYPES.includes(pt);
             return pt === activeFilter;
           })
         );
@@ -70,13 +108,26 @@ export default function ProductGrid({ photos }: ProductGridProps) {
 
       {/* Grid */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "1.25rem" }}>
-        {filtered.map((photo) => (
-          <ProductCard
-            key={photo.slug}
-            photo={photo}
-            mockupType={FILTER_MOCKUP[activeFilter]}
-          />
-        ))}
+        {filtered.map((photo) => {
+          const mockupType = getPhotoMockup(photo, activeFilter);
+          const subtitle = getCardSubtitle(photo, activeFilter, mockupType);
+          const price = getCardPrice(photo, activeFilter);
+          // Show exact price (no "from") when only one product type in this filter
+          const showFrom = activeFilter === "all"
+            || (activeFilter === "prints" && PRINT_TYPES.filter(t => photo.availableProducts.includes(t)).length > 1)
+            || (activeFilter === "gifts" && GIFT_TYPES.filter(t => photo.availableProducts.includes(t)).length > 1);
+
+          return (
+            <ProductCard
+              key={photo.slug}
+              photo={photo}
+              mockupType={mockupType}
+              subtitle={subtitle}
+              price={price}
+              showFrom={showFrom}
+            />
+          );
+        })}
       </div>
 
       {filtered.length === 0 && (

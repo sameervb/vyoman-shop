@@ -30,9 +30,10 @@ export default function Footer() {
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
             <span style={{ fontSize: "0.7rem", letterSpacing: "0.14em", textTransform: "uppercase", fontWeight: 500, color: "var(--faint)", marginBottom: "0.15rem" }}>Shop</span>
             <Link href="/shop" style={{ fontSize: "0.875rem", color: "var(--ink-2)" }}>All prints</Link>
-            <Link href="/shop?filter=postcard_a6" style={{ fontSize: "0.875rem", color: "var(--ink-2)" }}>Postcards</Link>
-            <Link href="/shop?filter=prints" style={{ fontSize: "0.875rem", color: "var(--ink-2)" }}>Framed prints & canvas</Link>
-            <Link href="/shop?filter=gifts" style={{ fontSize: "0.875rem", color: "var(--ink-2)" }}>Mugs & totes</Link>
+            <Link href="/shop#postcards" style={{ fontSize: "0.875rem", color: "var(--ink-2)" }}>Postcards</Link>
+            <Link href="/shop#prints" style={{ fontSize: "0.875rem", color: "var(--ink-2)" }}>Framed prints & canvas</Link>
+            <Link href="/shop#gifts" style={{ fontSize: "0.875rem", color: "var(--ink-2)" }}>Mugs & totes</Link>
+            <Link href="/about" style={{ fontSize: "0.875rem", color: "var(--ink-2)" }}>About</Link>
           </div>
 
           {/* Contact */}

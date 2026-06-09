@@ -216,6 +216,16 @@ export function getMinPrice(photo: Photo): number {
   );
 }
 
+/**
+ * Minimum price restricted to a given set of product types.
+ * Falls back to getMinPrice if none of the given types are available.
+ */
+export function getFilteredMinPrice(photo: Photo, types: ProductType[]): number {
+  const available = types.filter((t) => photo.availableProducts.includes(t));
+  if (available.length === 0) return getMinPrice(photo);
+  return Math.min(...available.map((t) => photo.prices[t]));
+}
+
 export function formatPrice(cents: number): string {
   return `€${(cents / 100).toFixed(2)}`;
 }

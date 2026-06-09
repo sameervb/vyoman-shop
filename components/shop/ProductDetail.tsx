@@ -128,6 +128,7 @@ export default function ProductDetail({ photo }: ProductDetailProps) {
                   alt={photo.title}
                   productType={selectedProduct}
                   aspectRatio={photo.aspectRatio}
+                  location={photo.location}
                 />
               </div>
             )}

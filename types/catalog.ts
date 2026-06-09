@@ -22,12 +22,12 @@ export type Photo = {
 };
 
 export const PRODUCT_LABELS: Record<ProductType, string> = {
-  postcard_a6: "Postcard A6",
+  postcard_a6: "Postcard A6 · 148×105 mm",
   matte_poster: "Matte Poster · 30×45 cm",
   framed_print: "Framed Print · 30×40 cm",
   canvas: "Canvas · 40×60 cm",
   mug: "Mug · 10 oz",
-  tote_bag: "Tote Bag",
+  tote_bag: "Tote Bag · 38×42 cm",
 };
 
 export type ProductSpec = {

@@ -16,6 +16,8 @@ interface Props {
   aspectRatio?: "3:2" | "2:3";
   /** Controls overall container height. "card" = compact grid card, "full" = detail page. */
   size?: "card" | "full";
+  /** Location name shown on postcard back instead of brand word. */
+  location?: string;
 }
 
 // ── Scene wrapper ──────────────────────────────────────────────────────────────
@@ -43,7 +45,10 @@ const Img = ({ src, alt, style }: { src: string; alt: string; style?: React.CSSP
 );
 
 // ── Postcard ──────────────────────────────────────────────────────────────────
-function PostcardMockup({ imageUrl, alt }: { imageUrl: string; alt: string }) {
+function PostcardMockup({ imageUrl, alt, location }: { imageUrl: string; alt: string; location?: string }) {
+  // Derive a short place name: take the part before the first comma
+  const placeName = location ? location.split(",")[0].trim() : "Luxembourg";
+
   return (
     <div style={{
       width: "100%", height: "100%",
@@ -69,29 +74,51 @@ function PostcardMockup({ imageUrl, alt }: { imageUrl: string; alt: string }) {
         flex: "0 0 38%",
         background: "white",
         aspectRatio: "3/2",
-        padding: "5%",
         boxShadow: "1px 3px 10px rgba(22,21,15,0.12)",
         transform: "rotate(0.8deg)",
         display: "flex", flexDirection: "column",
         boxSizing: "border-box",
         flexShrink: 0,
+        overflow: "hidden",
       }}>
-        {/* Top row: brand + stamp */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6%" }}>
-          <span style={{ fontSize: "0.4rem", letterSpacing: "0.08em", textTransform: "uppercase", color: "#97917F", fontWeight: 600 }}>
-            Vyoman
-          </span>
-          {/* Stamp box */}
-          <div style={{ width: "20%", aspectRatio: "4/5", border: "1px solid #D8D2C4" }} />
-        </div>
-        {/* Vertical divider + address lines */}
-        <div style={{ flex: 1, display: "flex", gap: "8%" }}>
-          <div style={{ width: "1px", background: "#D8D2C4", flexShrink: 0 }} />
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", gap: "16%" }}>
-            {[0, 1, 2].map((i) => (
-              <div key={i} style={{ height: "1px", background: "#E7E2D6" }} />
-            ))}
+        {/* Main content area */}
+        <div style={{ flex: 1, padding: "5%", display: "flex", flexDirection: "column" }}>
+          {/* Top row: place name + stamp */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "6%" }}>
+            <span style={{ fontSize: "0.38rem", letterSpacing: "0.06em", textTransform: "uppercase", color: "#6B6456", fontWeight: 700, lineHeight: 1 }}>
+              {placeName}
+            </span>
+            {/* Stamp box */}
+            <div style={{ width: "20%", aspectRatio: "4/5", border: "1px solid #D8D2C4" }} />
           </div>
+          {/* Vertical divider + address lines */}
+          <div style={{ flex: 1, display: "flex", gap: "8%" }}>
+            <div style={{ width: "1px", background: "#D8D2C4", flexShrink: 0 }} />
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "flex-end", gap: "16%" }}>
+              {[0, 1, 2].map((i) => (
+                <div key={i} style={{ height: "1px", background: "#E7E2D6" }} />
+              ))}
+            </div>
+          </div>
+        </div>
+        {/* Footer strip */}
+        <div style={{
+          borderTop: "0.5px solid #E0DAD0",
+          background: "#FAF8F4",
+          padding: "2% 5%",
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+        }}>
+          <span style={{ fontSize: "0.28rem", color: "#A09880", letterSpacing: "0.03em" }}>
+            vyomanaerials.com
+          </span>
+          <span style={{ fontSize: "0.28rem", color: "#C0B8A8" }}>·</span>
+          <span style={{ fontSize: "0.28rem", color: "#A09880", letterSpacing: "0.03em" }}>
+            @vyoman.aerials
+          </span>
+          <span style={{ fontSize: "0.28rem", color: "#C0B8A8" }}>·</span>
+          <span style={{ fontSize: "0.28rem", color: "#A09880", letterSpacing: "0.03em" }}>
+            shop.vyomanaerials.com
+          </span>
         </div>
       </div>
     </div>
@@ -233,10 +260,10 @@ function ToteMockup({ imageUrl, alt }: { imageUrl: string; alt: string }) {
 }
 
 // ── Main export ───────────────────────────────────────────────────────────────
-export default function ProductMockup({ imageUrl, alt, productType, aspectRatio = "3:2" }: Props) {
+export default function ProductMockup({ imageUrl, alt, productType, aspectRatio = "3:2", location }: Props) {
   switch (productType) {
     case "postcard_a6":
-      return <PostcardMockup imageUrl={imageUrl} alt={alt} />;
+      return <PostcardMockup imageUrl={imageUrl} alt={alt} location={location} />;
     case "matte_poster":
       return <PosterMockup imageUrl={imageUrl} alt={alt} aspectRatio={aspectRatio} />;
     case "framed_print":
